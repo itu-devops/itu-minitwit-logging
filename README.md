@@ -1,4 +1,4 @@
-This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added support for monitoring with Prometheus and Grafana as a Dashboard.
+This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added support for logging with the ELK stack.
 
 The application is Dockerized. To build the application and a client which simulates users clicking around the front page you have to:
 
