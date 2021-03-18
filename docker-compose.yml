@@ -1,0 +1,31 @@
+version: '3.5'
+
+networks:
+  main:
+    name: itu-minitwit-network
+
+
+services:
+  minitwitserver:
+    build:
+      context: .
+      dockerfile: docker/minitwit/Dockerfile
+    image: <youruser>/minitwitserver
+    container_name: minitwit
+    ports:
+      - "5000:5000"
+    networks:
+      - main
+    # depends_on:
+    #   - 
+
+
+  minitwitclient:
+    build:
+      context: .
+      dockerfile: docker/minitwit_client/Dockerfile
+    image: <youruser>/minitwitclient
+    networks:
+      - main
+    depends_on:
+      - minitwitserver
