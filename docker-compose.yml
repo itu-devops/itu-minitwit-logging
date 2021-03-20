@@ -1,31 +1,75 @@
 version: '3.5'
 
 networks:
+  elk:
   main:
     name: itu-minitwit-network
 
+volumes:
+    elk_elasticsearch_data:
 
 services:
   minitwitserver:
     build:
       context: .
       dockerfile: docker/minitwit/Dockerfile
-    image: <youruser>/minitwitserver
+    image: <USER>/minitwitserver
     container_name: minitwit
     ports:
       - "5000:5000"
     networks:
       - main
-    # depends_on:
-    #   - 
-
 
   minitwitclient:
     build:
       context: .
       dockerfile: docker/minitwit_client/Dockerfile
-    image: <youruser>/minitwitclient
+    image: <USER>/minitwitclient
     networks:
       - main
     depends_on:
       - minitwitserver
+
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:7.2.0"
+    environment:
+        - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+        - "discovery.type=single-node"
+    volumes:
+        - elk_elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+        - elk
+
+  kibana:
+    image: "docker.elastic.co/kibana/kibana:7.2.0"
+    environment:
+        elasticsearch.hosts: '["http://elasticsearch:9200"]'
+    networks:
+        - elk
+
+  filebeat:
+    image: "docker.elastic.co/beats/filebeat:7.2.0"
+    user: root
+    volumes:
+        - ${ELK_DIR}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+        - /var/lib/docker:/var/lib/docker:ro
+        - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+        - elk
+          
+  nginx: 
+    image: nginx
+    ports:
+      - 9200:9200
+      - 5601:5601
+      - 8881:8881
+      - 8882:8882
+    networks:
+      - elk
+    volumes:
+      - type: bind
+        source: ${ELK_DIR}/nginx.conf
+        target: /etc/nginx/nginx.conf
+      - type: bind
+        source: ${ELK_DIR}/.htpasswd
+        target: /etc/nginx/.htpasswd
