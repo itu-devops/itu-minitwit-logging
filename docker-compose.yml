@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: docker/minitwit/Dockerfile
-    image: <USER>/minitwitserver
+    image: ${ELK_USER}/minitwitserver
     container_name: minitwit
     ports:
       - "5000:5000"
@@ -24,7 +24,7 @@ services:
     build:
       context: .
       dockerfile: docker/minitwit_client/Dockerfile
-    image: <USER>/minitwitclient
+    image: ${ELK_USER}/minitwitclient
     networks:
       - main
     depends_on:
@@ -49,6 +49,8 @@ services:
 
   filebeat:
     image: "docker.elastic.co/beats/filebeat:7.2.0"
+    environment:
+        - "ELK_USER=${ELK_USER}"
     user: root
     volumes:
         - ${ELK_DIR}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro

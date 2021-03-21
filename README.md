@@ -20,12 +20,12 @@ This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added su
 
   * Build the application:
     ```bash
-    $ docker build -f docker/minitwit/Dockerfile -t <youruser>/webserver .
+    $ docker build -f docker/minitwit/Dockerfile -t $ELK_USER/webserver .
     ```
 
   * Build the test client:
     ```bash
-    $ docker build -f docker/minitwit_client/Dockerfile -t <youruser>/minitwitclient .
+    $ docker build -f docker/minitwit_client/Dockerfile -t $ELK_USER/minitwitclient .
     ```
 
   * Start the application:
@@ -33,8 +33,7 @@ This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added su
     $ docker-compose up
     ```
 
-    Alternatively, you can build and run the application in one step.
-    **OBS:** Remember to replace `<youruser>` in `docker-compose.yml` with your DockerHub user name before running the following:
+    Alternatively, you can build and run the application in one step. Runing the following:
     
     ```bash
     $ docker-compose up --build
@@ -54,9 +53,8 @@ docker.elastic.co/kibana/kibana:7.2.0                 itu-minitwit-logging_kiban
 
 ### How to access parts of the application
   * _ITU-MiniTwit_ at http://localhost:5000
-  * _ITU-MiniTwit Kibana Dasboard_ at http://localhost:8882 
+  * _ITU-MiniTwit Kibana Dasboard_ at http://localhost:5601, requiring atuhententication with previously defined username and password.
 
-You should not be able to access Kibana/Elasticsearch directly, but you should be able to access the Ngix proxy on `localhost:8882` after you authenticate with the previously specificed user name and password.
 
 ### How to stop the application
 To stop the application again run:
@@ -150,6 +148,36 @@ We have:
   * `minitwitclient` running in the same `main` network and depending on our server
   * `kibana`, `filebeat` and `elasticsearch`, all within `elk` network and not exposing any ports directly
   * Finally, we have `ngix` running in the same network and using our `ngix.conf` file to setup a proxy to elasticsearch
+
+**Log indices**
+We have configured Filebeat to use different indices for different containers, so we can more easily manage them in Kibana:
+
+```yaml
+indices:
+    - index: "filebeat-elastic-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.or:
+        - equals:
+            container.image.name: docker.elastic.co/beats/filebeat:7.2.0
+        - equals:
+            container.image.name: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+        - equals:
+            container.image.name: docker.elastic.co/kibana/kibana:7.2.0
+    - index: "filebeat-minitwit-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.or:
+          - equals:
+              container.image.name: ${ELK_USER}/minitwitserver
+          - equals:
+              container.image.name: ${ELK_USER}/minitwitclient
+    - index: "filebeat-ngix-%{[agent.version]}-%{+yyyy.MM.dd}"
+      when.equals:
+        container.image.name: nginx
+```
+
+In your Kibana app use the following:
+  * `filebeat-elastic-*` for kibana/elasticsearch logs
+  * `filebeat-minitwit-*` for all of your Minitwit looging. You can also additionally split the logs between client/server
+  * `filebeat-ngix-*` for logs from proxy, there is a lot of them, so we probably want them filtered out
+
 
 **Proxy setup:**
 ```conf
