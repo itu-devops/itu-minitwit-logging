@@ -7,6 +7,7 @@ networks:
 
 volumes:
     elk_elasticsearch_data:
+    kibanadata:
 
 services:
   minitwitserver:
@@ -31,24 +32,28 @@ services:
       - minitwitserver
 
   elasticsearch:
-    image: "docker.elastic.co/elasticsearch/elasticsearch:7.17.1"
+    image: "docker.elastic.co/elasticsearch/elasticsearch:8.6.2"
     environment:
         - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
         - "discovery.type=single-node"
+        - "xpack.security.enabled=false"
     volumes:
         - elk_elasticsearch_data:/usr/share/elasticsearch/data
     networks:
         - elk
 
   kibana:
-    image: "docker.elastic.co/kibana/kibana:7.17.1"
+    image: "docker.elastic.co/kibana/kibana:8.6.2"
     environment:
-        elasticsearch.hosts: '["http://elasticsearch:9200"]'
+        - "elasticsearch.hosts='[\"http://elasticsearch:9200\"]'"
+        - "xpack.security.enabled=false"
     networks:
         - elk
+    volumes:
+        - kibanadata:/usr/share/kibana/data
 
   filebeat:
-    image: "docker.elastic.co/beats/filebeat:7.17.1"
+    image: "docker.elastic.co/beats/filebeat:8.6.2"
     environment:
         - "ELK_USER=${ELK_USER}"
     user: root

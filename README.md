@@ -212,3 +212,5 @@ http {
 ```
   * Upstreams for our apps are both defined using container names that we have previously defined in our `docker-compose` and using default ports for both applications.
   * Then we listen on ports `8881/8882`, redirecting them to appropriate applications, but first requiring authentication, using the file originally created in setup for this exercise.
+
+You can also enable the `xpack.security` module instead of using nginx, see https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html for details. This involves a bit more work, but improves your setups security by a lot.
