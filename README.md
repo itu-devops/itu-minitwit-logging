@@ -1,5 +1,7 @@
 This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added support for logging with the ELF stack. The application is Dockerized. 
 
+There's a updated branch with a newer [EFK 8](https://github.com/itu-devops/itu-minitwit-logging/tree/efk-8) stack (instead of EFK 7), but note that we were unable to make it work on all of our machines. See the [diff](https://github.com/itu-devops/itu-minitwit-logging/commit/2d814fb3b216b2a6ab3d769f4915e7f5c371c52f) for changes.
+
 ### How to start the application
   * Setup some pre-required ENV variables and other stuff:
     ```bash
