@@ -3,7 +3,7 @@ This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added su
 There's an alternative branch that uses the EFK 8 stack with nginx at [EFK 8](https://github.com/itu-devops/itu-minitwit-logging/tree/efk-8) stack (instead of EFK 7), but note that we were unable to make it work on all of our machines. See the [diff](https://github.com/itu-devops/itu-minitwit-logging/commit/2d814fb3b216b2a6ab3d769f4915e7f5c371c52f) for changes.
 
 
-*NOTICE:* _The current setup is inspired by work done by [deviantony/docker-elk](https://github.com/deviantony/docker-elk). For more information and tips and tricks check out their repository._
+*NOTICE:* _The current setup is inspired by work done by [deviantony/docker-elk](https://github.com/deviantony/docker-elk). For more information and tips and tricks check out their repository._ (There is a TLS version found in that repository as well.)
 
 ### How to start the application
   * Before running the stack (ELFK) is recommended to change the variables specified in the .env file.
@@ -34,7 +34,8 @@ docker-elk-elasticsearch           docker-elk-elasticsearch-1    0.0.0.0:9200->9
 
 ### How to access parts of the application
   * _ITU-MiniTwit_ at http://localhost:5000
-  * _ITU-MiniTwit Kibana Dasboard_ at http://localhost:5601, requiring authentication username and password defined in the .env file.
+  * _ITU-MiniTwit Kibana Dasboard_ at http://localhost:5601, requiring the password defined in the .env file and the username elastic.
+_Use this user to create less privileged ones see: [built-in-user-passwords](https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-users.html#set-built-in-user-passwords) for more information_
 
 
 ### How to stop the application
