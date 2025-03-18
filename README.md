@@ -154,5 +154,10 @@ We have:
   * `minitwitclient` running in the same `main` network and depending on our server
   * `kibana`,`logstash` ,`filebeat` and `elasticsearch`, all within `elk` network and not exposing any ports directly
 
+Log pipeline:
+  1. Filebeat reads filebeat.yml and will automatically collect docker logs, with filebeat.autodiscover, from containers json.log files. Filebeat sends the log data to `logstash:5044`.
+  2. Logstash reads `pipeline/logstash.conf` and listens on port 5044 for filebeat data. Logstash uses a filter expression to get data fields from the logs, and sends the parsed logs to `elasticsearch:9200`.
+  3. Elastic search listens on port 9200 and gets the logstash data, as a data stream which it calls `logs-generic-default`. Creating a data-view on `logs-generic-default` you can see the extra fields extracted by logstash, if the log is a request to the server.
+
 
 If for some reason you can't recreate using the `docker compose up setup` try `docker compose up setup --force-recreate` instead. 
