@@ -3,7 +3,7 @@ version: '3.7'
 services:
   filebeat:
     build:
-      context: ../../extensions/filebeat/
+      context: .
       args:
         ELASTIC_VERSION: ${ELASTIC_VERSION}
     # Run as 'root' instead of 'filebeat' (uid 1000) to allow reading

@@ -5,8 +5,7 @@ services:
     restart: unless-stopped
     container_name: minitwit
     build:
-      context: .
-      dockerfile: docker/minitwit/Dockerfile
+      context: minitwit
     ports:
       - "5000:5000"
     networks:
@@ -17,8 +16,7 @@ services:
   minitwitclient:
     restart: unless-stopped
     build:
-      context: .
-      dockerfile: docker/minitwit_client/Dockerfile
+      context: minitwit_client
     networks:
       - main
     depends_on:
@@ -115,7 +113,7 @@ services:
 
   filebeat:
     extends:
-      file: ./extensions/filebeat/filebeat-compose.yml
+      file: ./filebeat/filebeat-compose.yml
       service: filebeat
     logging:
       driver: json-file
