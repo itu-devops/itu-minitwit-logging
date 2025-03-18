@@ -11,6 +11,8 @@ services:
       - "5000:5000"
     networks:
       - main
+    logging:
+      driver: json-file
 
   minitwitclient:
     restart: unless-stopped
@@ -21,6 +23,8 @@ services:
       - main
     depends_on:
       - minitwitserver
+    logging:
+      driver: json-file
 
   # The 'setup' service runs a one-off script which initializes users inside
   # Elasticsearch — such as 'logstash_internal' and 'kibana_system' — with the
@@ -86,6 +90,8 @@ services:
     networks:
       - elk
     restart: unless-stopped
+    logging:
+      driver: json-file
 
   logstash:
     build:
@@ -108,11 +114,15 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+    logging:
+      driver: json-file
 
   filebeat:
     extends:
       file: ./extensions/filebeat/filebeat-compose.yml
       service: filebeat
+    logging:
+      driver: json-file
 
   kibana:
     build:
@@ -130,6 +140,8 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+    logging:
+      driver: json-file
 
 networks:
   elk:
