@@ -1,8 +1,5 @@
 This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added support for logging with the ELF stack. The application is Dockerized. 
 
-There's an alternative branch that uses the EFK 8 stack with nginx at [EFK 8](https://github.com/itu-devops/itu-minitwit-logging/tree/efk-8) stack (instead of EFK 7), but note that we were unable to make it work on all of our machines. See the [diff](https://github.com/itu-devops/itu-minitwit-logging/commit/2d814fb3b216b2a6ab3d769f4915e7f5c371c52f) for changes.
-
-
 *NOTICE:* _The current setup is inspired by work done by [deviantony/docker-elk](https://github.com/deviantony/docker-elk). For more information and tips and tricks check out their repository._ (There is a TLS version found in that repository as well.)
 
 ### How to start the application
@@ -152,7 +149,7 @@ volumes:
 We have:
   * `minitwitserver` listening on port 5000
   * `minitwitclient` running in the same `main` network and depending on our server
-  * `kibana`,`logstash` ,`filebeat` and `elasticsearch`, all within `elk` network and not exposing any ports directly
+  * `kibana`,`logstash` ,`filebeat` and `elasticsearch`, all within `elk` network.
 
 Log pipeline:
   1. Filebeat reads filebeat.yml and will automatically collect docker logs, with filebeat.autodiscover, from containers json.log files. Filebeat sends the log data to `logstash:5044`.
