@@ -8,8 +8,6 @@ services:
       - "5001:5000"
     networks:
       - main
-    logging:
-      driver: json-file
 
   minitwitclient:
     restart: unless-stopped

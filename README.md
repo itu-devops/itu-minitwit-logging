@@ -55,6 +55,17 @@ $ docker compose down -v
 
 _Note:_ _The -v is stands for volumes, and will remove all named volumes specified in the docker compose. In this case it will delete the elasticsearch volume with all the saved data._
 
+### Basics of how to use Kibana
+1. Go to the Kibana Web UI at `http://localhost:5601/`, and login with the username `elastic` and the ELASTIC_PASSWORD defined in the .env file. 
+2. Kibana has many ways to view the log data. Start by going to `Discover`, under the Analytics tab from the sidebar. This will prompt you to make a data view. 
+3. Create a new data view. You should see the `logs-generic-default` Data stream which is the logs sent by logstash. 
+4. The index pattern specifies what data the view should use. Set the index pattern to `logs-generic-default`, give it a name and save the data view to Kibana. 
+5. In the discover view you should see logs being received in the graph, and you can edit the time you want to see in the top right. You can expand documents to view all the info from that log. In the list of available fields you can find things like `path` and `response code` which logstash parsed. 
+6. Explore the `Dashboard` tab, also under the Analytics, where you can fx drag in the path field path, and get a graph of the most used endpoints
+7. Check out `Stack Monitoring` at the bottom of the side panel to see the statistics of the filebeat instance. 
+8. Lastly to manage users, data views and more, go to the last option in the side panel `Stack management`
+
+
 ### Breakdown of the configuration
 
 Let's look at the docker-compose.yml present in our main directory:
