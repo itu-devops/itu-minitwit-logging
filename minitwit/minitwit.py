@@ -10,7 +10,6 @@
 """
 from __future__ import with_statement
 import time
-import psutil
 import sqlite3
 from hashlib import md5
 from random import randint
@@ -28,7 +27,7 @@ from flask import (
     g,
     flash,
 )
-from werkzeug import check_password_hash, generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
