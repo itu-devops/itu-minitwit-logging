@@ -19,15 +19,6 @@ docker compose up -d
 > here the `-d` flag means "detach", so logs from the containers are not printed in the terminal, which can be very verbose.
 
 After a moment, three containers should be running:
-
-```bash
-$ docker ps
-IMAGE                                        NAMES                                  PORTS
-itu-minitwit-dozzle-minitwitserver           minitwit                               0.0.0.0:5001->5000/tcp
-itu-minitwit-dozzle-minitwitclient           itu-minitwit-dozzle-minitwitclient-1
-amir20/dozzle:latest                         itu-minitwit-dozzle-dozzle-1           0.0.0.0:8080->8080/tcp
-```
-
 ```bash
 CONTAINER ID   IMAGE                                 COMMAND                  CREATED          STATUS          PORTS                    NAMES
 0fe57d7450c7   amir20/dozzle:latest                  "/dozzle"                34 seconds ago   Up 33 seconds   0.0.0.0:8080->8080/tcp   itu-minitwit-logging-dozzle-1
