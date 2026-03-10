@@ -18,5 +18,19 @@ services:
     depends_on:
       - minitwitserver
 
+  dozzle:
+    image: amir20/dozzle:latest
+    volumes:
+      # Dozzle needs read-only access to the Docker socket to stream container logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "8080:8080"
+    environment:
+      # Log level for Dozzle itself (not your application logs)
+      DOZZLE_LEVEL: info
+    restart: unless-stopped
+    networks:
+      - main
+
 networks:
   main:
