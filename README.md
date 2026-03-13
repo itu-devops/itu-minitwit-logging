@@ -42,7 +42,7 @@ itu-minitwit-logging-elasticsearch    itu-minitwit-logging-elasticsearch-1    0.
 ### How to access parts of the application
 
 - _ITU-MiniTwit_ at http://localhost:5001
-- _ITU-MiniTwit Kibana Dasboard_ at http://localhost:5601, requiring the password defined in the .env file and the username elastic.
+- _ITU-MiniTwit Kibana Dasboard_ at http://localhost:5601, requiring the password defined in the .env file and the username `elastic`.
   _Use this user to create less privileged ones see: [built-in-user-passwords](https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-users.html#set-built-in-user-passwords) for more information_
 
 ### How to stop the application
@@ -61,7 +61,7 @@ _Note:_ _The -v is stands for volumes and will remove all named volumes specifie
 3. Create a new data view. You should see the `logs-generic-default` Data stream which is the logs sent by logstash. 
 4. The index pattern specifies what data the view should use. Set the index pattern to `logs-generic-default`, give it a name and save the data view to Kibana. 
 5. In the discover view you should see logs being received in the graph, and you can edit the time you want to see in the top right. You can expand documents to view all the info from that log. In the list of available fields you can find things like `path` and `response code` which logstash parsed. 
-6. Explore the `Dashboard` tab, also under the Analytics, where you can fx drag in the path field path, and get a graph of the most used endpoints
+6. Explore the `Dashboard` tab, also under the Analytics, where you can for example drag in the path field path, and get a graph of the most used endpoints
 7. Check out `Stack Monitoring` at the bottom of the side panel to see the statistics of the filebeat instance. 
 8. Lastly to manage users, data views and more, go to the last option in the side panel `Stack management`
 
