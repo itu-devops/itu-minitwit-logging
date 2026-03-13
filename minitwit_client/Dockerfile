@@ -1,6 +1,4 @@
-FROM python:3
-
-EXPOSE 5000
+FROM python:3.11-slim
 
 WORKDIR /usr/src/app
 
