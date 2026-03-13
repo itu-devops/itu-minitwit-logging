@@ -1,51 +1,40 @@
-This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added support for logging with the ELF stack. The application is Dockerized.
+# An Exemplary Logging Setup for _ITU_MiniTwit_
 
-_NOTICE:_ _The current setup is inspired by work done by [deviantony/docker-elk](https://github.com/deviantony/docker-elk). For more information and tips and tricks check out their repository._ (There is a TLS version found in that repository as well.)
+This repository contains an exemplary logging setup consisting of [Grafana Loki](./loki), [Grafana Promtail](./promtail) and [Grafana](./grafana).
+It collects and visualizes logs from a [basic _ITU_MiniTwit_ application (Python 3 and SQLite)](./minitwit.py), which is instrumented to log messages to stdout.
+So that the logging dashboards can show some exemplary visualizations and so that Promtail can ship some exemplary logs, this repository contains [a client](./minitwit_client_sim.py) which simulates users clicking around the front page of the _ITU_MiniTwit_ application.
 
-### How to start the application
 
-- Before running the stack (ELFK) is recommended to change the variables specified in the .env file.
+## Starting the Logging Stack
 
-- Before running the application, use the following command to set up the correct environment.
+### How to start the application?
 
-```console
-$ docker compose up setup
-```
-
-- This will leave the setup container with the status of exited. (see `docker ps -a`) To remove the setup container run
-
-```console
-$ docker rm itu-minitwit-logging-setup-1
-```
-
-- When the setup is done, you can start the stack with the following command.
+The entire application setup and logging stack is encoded in the [`docker-compose.yml` file](./docker-compose.yml).
+You can start the entire application with client and login stack in the usual way:
 
 ```console
 $ docker compose up -d
 ```
 
-_NOTE:_ _Be careful of not pushing your .env to GitHub if it contains confidential information_
-
-After running `docker compose up`, 6 images should be up and running:
+After running `docker compose up`, five containers should be up and running:
 
 ```
 $ docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Ports}}"
 IMAGE                                 NAMES                                   PORTS
 itu-minitwit-logging-minitwitclient   itu-minitwit-logging-minitwitclient-1   5000/tcp
-itu-minitwit-logging-minitwitserver   minitwit                                0.0.0.0:5001->5000/tcp
-itu-minitwit-logging-filebeat         itu-minitwit-logging-filebeat-1
-itu-minitwit-logging-kibana           itu-minitwit-logging-kibana-1           0.0.0.0:5601->5601/tcp
-itu-minitwit-logging-logstash         itu-minitwit-logging-logstash-1         0.0.0.0:5044->5044/tcp, 9600/tcp
-itu-minitwit-logging-elasticsearch    itu-minitwit-logging-elasticsearch-1    0.0.0.0:9200->9200/tcp, 9300/tcp
+grafana/grafana:12.1                  grafana                                 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp
+grafana/promtail:2.9.3                promtail
+grafana/loki:2.9.3                    loki                                    0.0.0.0:3100->3100/tcp, :::3100->3100/tcp
+itu-minitwit-logging-minitwitserver   minitwit                                0.0.0.0:5001->5000/tcp, :::5001->5000/tcp
 ```
 
 ### How to access parts of the application
 
 - _ITU-MiniTwit_ at http://localhost:5001
-- _ITU-MiniTwit Kibana Dasboard_ at http://localhost:5601, requiring the password defined in the .env file and the username elastic.
-  _Use this user to create less privileged ones see: [built-in-user-passwords](https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-users.html#set-built-in-user-passwords) for more information_
+- Grafana at http://localhost:3000
 
-### How to stop the application
+
+### How to stop the application?
 
 To stop the application again, run:
 
@@ -53,18 +42,17 @@ To stop the application again, run:
 $ docker compose down -v
 ```
 
-_Note:_ _The -v is stands for volumes and will remove all named volumes specified in the docker compose. In this case it will delete the elasticsearch volume with all the saved data._
+_Note:_ The `-v` switch stands for _volumes_ and will remove all named volumes specified in the docker compose file.
+In this case, it will delete the Loki, Promtail, and Grafana volumes with all saved data.
 
-### Basics of how to use Kibana
-1. Go to the Kibana Web UI at `http://localhost:5601/`, and login with the username `elastic` and the ELASTIC_PASSWORD defined in the .env file. 
-2. Kibana has many ways to view the log data. Start by going to `Discover`, under the Analytics tab from the sidebar. This will prompt you to make a data view. 
-3. Create a new data view. You should see the `logs-generic-default` Data stream which is the logs sent by logstash. 
-4. The index pattern specifies what data the view should use. Set the index pattern to `logs-generic-default`, give it a name and save the data view to Kibana. 
-5. In the discover view you should see logs being received in the graph, and you can edit the time you want to see in the top right. You can expand documents to view all the info from that log. In the list of available fields you can find things like `path` and `response code` which logstash parsed. 
-6. Explore the `Dashboard` tab, also under the Analytics, where you can fx drag in the path field path, and get a graph of the most used endpoints
-7. Check out `Stack Monitoring` at the bottom of the side panel to see the statistics of the filebeat instance. 
-8. Lastly to manage users, data views and more, go to the last option in the side panel `Stack management`
+### See your first logs in Grafana
 
+1. Go to the Grafana web UI at `http://localhost:3000/`, and login with the username `admin` with password `admin`.
+2. Navigate to ["Drilldown" -> "Logs" (on the left-hand side of the UI)](http://localhost:3000/a/grafana-lokiexplore-app/explore?patterns=%5B%5D&var-primary_label=container%7C%3D~%7C.%2B&from=now-15m&to=now&timezone=browser&var-lineFormat=&var-ds=P8E80F9AEF21F6940&var-filters=&var-fields=&var-levels=&var-metadata=&var-jsonFields=&var-all-fields=&var-patterns=&var-lineFilterV2=&var-lineFilters=&var-filters_replica=)
+3. Add your first LogQL query `{container="minitwit"}` and click "Show logs"
+   <img src="images/logql_query.png" width="50%">
+4. Inspect the first log messages from the _ITU_MiniTwit_ application container
+   <img src="images/log_view.png">
 
 ### Breakdown of the configuration
 
@@ -81,8 +69,8 @@ services:
       - "5001:5000"
     networks:
       - main
-    logging:
-      driver: json-file
+    labels:
+      logging: "promtail"
 
   minitwitclient:
     restart: unless-stopped
@@ -92,88 +80,83 @@ services:
       - main
     depends_on:
       - minitwitserver
+    labels:
+      logging: "promtail"
 
-  setup: ...
-
-  elasticsearch:
-    build:
-      context: elasticsearch/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
-    volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,Z
-      - elasticsearch:/usr/share/elasticsearch/data:Z
+  loki:
+    image: grafana/loki:2.9.3
+    container_name: loki
     ports:
-      - 9200:9200 # Main Elasticsearch input
-    environment:
-      node.name: elasticsearch
-      ES_JAVA_OPTS: -Xms512m -Xmx512m
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD:-}
-      discovery.type: single-node
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - elk
+      - main
     restart: unless-stopped
 
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
+  promtail:
+    image: grafana/promtail:2.9.3
+    container_name: promtail
     volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro,Z
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro,Z
-    ports:
-      - 5044:5044 # Beats input
-    environment:
-      LS_JAVA_OPTS: -Xms256m -Xmx256m
-      LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
     networks:
-      - elk
+      - main
     depends_on:
-      - elasticsearch
+      - loki
     restart: unless-stopped
 
-  filebeat: # Uses another docker compose file to setup filebeat.
-    extends:
-      file: ./filebeat/filebeat-compose.yml
-      service: filebeat
-
-  kibana:
-    build:
-      context: kibana/
-      args:
-        ELASTIC_VERSION: ${ELASTIC_VERSION}
-    volumes:
-      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro,Z
+  grafana:
+    image: grafana/grafana:12.1
+    container_name: grafana
     ports:
-      - 5601:5601 # Kibana UI Dashboard
+      - "3000:3000"
+    volumes:
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - grafana-data:/var/lib/grafana
     environment:
-      KIBANA_SYSTEM_PASSWORD: ${KIBANA_SYSTEM_PASSWORD:-}
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
     networks:
-      - elk
+      - main
     depends_on:
-      - elasticsearch
+      - loki
     restart: unless-stopped
 
 networks:
-  elk:
-    driver: bridge
   main:
+    driver: bridge
 
 volumes:
-  elasticsearch:
+  loki-data:
+  grafana-data:
 ```
 
 We have:
 
 - `minitwitserver` listening on port 5000 inside of the container (and 5001 on the host machine)
 - `minitwitclient` running in the same `main` network and depending on our server
-- `kibana`,`logstash` ,`filebeat` and `elasticsearch`, all within `elk` network.
+- All applications run within the `itu-minitwit-network` network.
 
 Log pipeline:
 
-1. Filebeat reads filebeat.yml and will automatically collect docker logs, with filebeat.autodiscover, from containers json.log files. Filebeat sends the log data to `logstash:5044`.
-2. Logstash reads `pipeline/logstash.conf` and listens on port 5044 for filebeat data. Logstash uses a filter expression to get data fields from the logs, and sends the parsed logs to `elasticsearch:9200`.
-3. Elastic search listens on port 9200 and gets the logstash data, as a data stream which it calls `logs-generic-default`. Creating a data-view on `logs-generic-default` you can see the extra fields extracted by logstash, if the log is a request to the server.
-
-If for some reason you can't recreate using the `docker compose up setup` try `docker compose up setup --force-recreate` instead.
+- _ITU-MiniTwit_ (Application) creates logs via the logging library and writes them to stdout. The application is containerized running in a Docker container.
+  - Logs are visible on the host machine via `docker logs minitwit`.
+- Promtail (Log Collector/Shipper)
+  - Collects logs from Docker containers by scraping Docker container log files (via `/var/lib/docker/containers`) and Docker socket (`/var/run/docker.sock`)
+  - Ships logs to Loki at http://loki:3100/loki/api/v1/push
+  - Promtail automatically discovers all running containers, reads their logs from stdout/stderr, adds labels (container name, stream), and forwards them Loki for log storage and aggregation
+- Loki (Log Storage/Aggregation)
+  - Stores and indexes log data efficiently, i.e., without full-text indexing as [ElasticSearch would do](https://github.com/itu-devops/itu-minitwit-logging/tree/master).
+  - It receives logs from Promtail, which pushes them via HTTP to http://loki:3100/loki/api/v1/push
+  - Serves log messages to Grafana as a data source via HTTP queries http://loki:3100
+  - Loki stores log messages with timestamps and labels and provides a query API for log retrieval using LogQL
+- Grafana (Visualization/UI)
+  - Amongst others, Grafana provides a web interface for querying, viewing, and visualizing logs
+  - Users access it via a web browser at http://localhost:3000
+  - Logging dashboards can be created via LogQL queries (e.g., {container="minitwit"}, {container="minitwit"} |= "slow", etc.)
