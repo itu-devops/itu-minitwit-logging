@@ -7,7 +7,7 @@ services:
     ports:
       - "5001:5000"
     networks:
-      - main
+      - itu-minitwit-network
     labels:
       logging: "promtail"
 
@@ -16,7 +16,7 @@ services:
     build:
       context: minitwit_client
     networks:
-      - main
+      - itu-minitwit-network
     depends_on:
       - minitwitserver
     labels:
@@ -32,7 +32,7 @@ services:
       - loki-data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - main
+      - itu-minitwit-network
     restart: unless-stopped
 
   promtail:
@@ -44,7 +44,7 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: -config.file=/etc/promtail/config.yml
     networks:
-      - main
+      - itu-minitwit-network
     depends_on:
       - loki
     restart: unless-stopped
@@ -62,14 +62,15 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
-      - main
+      - itu-minitwit-network
     depends_on:
       - loki
     restart: unless-stopped
 
 networks:
-  main:
-    driver: bridge
+  itu-minitwit-network:
+    external: false
+    name: itu-minitwit-network
 
 volumes:
   loki-data:
