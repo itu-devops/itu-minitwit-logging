@@ -6,7 +6,7 @@ _NOTICE:_ _The current setup is inspired by work done by [deviantony/docker-elk]
 
 - Before running the stack (ELFK) is recommended to change the variables specified in the .env file.
 
-- Before running the application use the following command to setup the correct environment.
+- Before running the application, use the following command to set up the correct environment.
 
 ```console
 $ docker compose up setup
@@ -15,16 +15,16 @@ $ docker compose up setup
 - This will leave the setup container with the status of exited. (see `docker ps -a`) To remove the setup container run
 
 ```console
-$ docker compose down setup
+$ docker rm itu-minitwit-logging-setup-1
 ```
 
-- When the setup is done you can start the stack with the following command.
+- When the setup is done, you can start the stack with the following command.
 
 ```console
 $ docker compose up -d
 ```
 
-_NOTE:_ _Be careful of not pushing your .env to github, if it contains confidential information_
+_NOTE:_ _Be careful of not pushing your .env to GitHub if it contains confidential information_
 
 After running `docker compose up`, 6 images should be up and running:
 
@@ -47,13 +47,13 @@ itu-minitwit-logging-elasticsearch    itu-minitwit-logging-elasticsearch-1    0.
 
 ### How to stop the application
 
-To stop the application again run:
+To stop the application again, run:
 
 ```bash
 $ docker compose down -v
 ```
 
-_Note:_ _The -v is stands for volumes, and will remove all named volumes specified in the docker compose. In this case it will delete the elasticsearch volume with all the saved data._
+_Note:_ _The -v is stands for volumes and will remove all named volumes specified in the docker compose. In this case it will delete the elasticsearch volume with all the saved data._
 
 ### Basics of how to use Kibana
 1. Go to the Kibana Web UI at `http://localhost:5601/`, and login with the username `elastic` and the ELASTIC_PASSWORD defined in the .env file. 
