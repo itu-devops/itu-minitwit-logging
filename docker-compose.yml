@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
 
   promtail:
-    image: grafana/promtail:3.4.2
+    image: grafana/promtail:3.6.0
     container_name: promtail
     volumes:
       - ./promtail/promtail-config.yml:/etc/promtail/config.yml

@@ -12,20 +12,20 @@ So that the logging dashboards can show some exemplary visualizations and so tha
 The entire application setup and logging stack is encoded in the [`docker-compose.yml` file](./docker-compose.yml).
 You can start the entire application with client and login stack in the usual way:
 
-```console
+```sh
 $ docker compose up -d
 ```
 
 After running `docker compose up`, five containers should be up and running:
 
-```
+```docker
 $ docker ps --format "table {{.Image}}\t{{.Names}}\t{{.Ports}}"
 IMAGE                                 NAMES                                   PORTS
-itu-minitwit-logging-minitwitclient   itu-minitwit-logging-minitwitclient-1   5000/tcp
-grafana/grafana:12.1                  grafana                                 0.0.0.0:3000->3000/tcp, :::3000->3000/tcp
-grafana/promtail:2.9.3                promtail
-grafana/loki:2.9.3                    loki                                    0.0.0.0:3100->3100/tcp, :::3100->3100/tcp
-itu-minitwit-logging-minitwitserver   minitwit                                0.0.0.0:5001->5000/tcp, :::5001->5000/tcp
+itu-minitwit-logging-minitwitclient   itu-minitwit-logging-minitwitclient-1
+grafana/grafana:12.4.1                grafana                                 0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+grafana/promtail:3.6.0                promtail
+itu-minitwit-logging-minitwitserver   minitwit                                0.0.0.0:5001->5000/tcp, [::]:5001->5000/tcp
+grafana/loki:3.6.7                    loki                                    0.0.0.0:3100->3100/tcp, [::]:3100->3100/tcp                            0.0.0.0:5001->5000/tcp, :::5001->5000/tcp
 ```
 
 ### How to access parts of the application
@@ -68,7 +68,7 @@ services:
     ports:
       - "5001:5000"
     networks:
-      - main
+      - itu-minitwit-network
     labels:
       logging: "promtail"
 
@@ -77,14 +77,14 @@ services:
     build:
       context: minitwit_client
     networks:
-      - main
+      - itu-minitwit-network
     depends_on:
       - minitwitserver
     labels:
       logging: "promtail"
 
   loki:
-    image: grafana/loki:2.9.3
+    image: grafana/loki:3.6.7
     container_name: loki
     ports:
       - "3100:3100"
@@ -93,11 +93,11 @@ services:
       - loki-data:/loki
     command: -config.file=/etc/loki/local-config.yaml
     networks:
-      - main
+      - itu-minitwit-network
     restart: unless-stopped
 
   promtail:
-    image: grafana/promtail:2.9.3
+    image: grafana/promtail:3.6.0
     container_name: promtail
     volumes:
       - ./promtail/promtail-config.yml:/etc/promtail/config.yml
@@ -105,13 +105,13 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: -config.file=/etc/promtail/config.yml
     networks:
-      - main
+      - itu-minitwit-network
     depends_on:
       - loki
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:12.1
+    image: grafana/grafana:12.4.1
     container_name: grafana
     ports:
       - "3000:3000"
@@ -123,24 +123,28 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
-      - main
+      - itu-minitwit-network
     depends_on:
       - loki
     restart: unless-stopped
 
 networks:
-  main:
-    driver: bridge
+  itu-minitwit-network:
+    external: false
+    name: itu-minitwit-network
 
 volumes:
   loki-data:
   grafana-data:
+
 ```
+
+> **Note:** Loki 3.x requires `allow_structured_metadata: false` in the `limits_config` section when using older schema versions. This is configured in `loki/loki-config.yml`.
 
 We have:
 
 - `minitwitserver` listening on port 5000 inside of the container (and 5001 on the host machine)
-- `minitwitclient` running in the same `main` network and depending on our server
+- `minitwitclient` running in the same `itu-minitwit-network` and depending on our server
 - All applications run within the `itu-minitwit-network` network.
 
 Log pipeline:
