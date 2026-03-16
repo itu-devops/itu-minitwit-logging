@@ -49,10 +49,10 @@ In this case, it will delete the Loki, Promtail, and Grafana volumes with all sa
 
 1. Go to the Grafana web UI at `http://localhost:3000/`, and login with the username `admin` with password `admin`.
 2. Navigate to ["Drilldown" -> "Logs" (on the left-hand side of the UI)](http://localhost:3000/a/grafana-lokiexplore-app/explore?patterns=%5B%5D&var-primary_label=container%7C%3D~%7C.%2B&from=now-15m&to=now&timezone=browser&var-lineFormat=&var-ds=P8E80F9AEF21F6940&var-filters=&var-fields=&var-levels=&var-metadata=&var-jsonFields=&var-all-fields=&var-patterns=&var-lineFilterV2=&var-lineFilters=&var-filters_replica=)
-3. Add your first LogQL query `{container="minitwit"}` and click "Show logs"
-   <img src="images/logql_query.png" width="50%">
-4. Inspect the first log messages from the _ITU_MiniTwit_ application container
+3. Inspect the first log messages from the _ITU_MiniTwit_ application container
    <img src="images/log_view.png">
+4. Click on minitwit -> Show logs and add your first LogQL query filtering for `slow` responses
+   <img src="images/logql_query.png" width="50%">
 
 ### Breakdown of the configuration
 
