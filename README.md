@@ -1,6 +1,8 @@
 This is the basic _ITU_MiniTwit_ application (Python 3 and SQLite) with added support for logging with the ELF stack. The application is Dockerized.
 
-_NOTICE:_ _The current setup is inspired by work done by [deviantony/docker-elk](https://github.com/deviantony/docker-elk). For more information and tips and tricks check out their repository._ (There is a TLS version found in that repository as well.)
+_NOTICE:_ _The current setup is inspired by work done by [deviantony/docker-elk](https://github.com/deviantony/docker-elk). For more information and tips and tricks check out their repository._ (There is a TLS version found in that repository as well.
+
+_NOTICE:_ For Grafana-Loki see the branch: https://github.com/itu-devops/itu-minitwit-logging/tree/grafana_loki. OR another one, https://github.com/itu-devops/itu-minitwit-logging/tree/logging-with-dozzel -- but this is not persistent. 
 
 ### How to start the application
 
